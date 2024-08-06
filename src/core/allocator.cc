@@ -1,4 +1,3 @@
-#include "core/allocator.h"
 #include <cstdio>
 #include <cstdlib>
 #include <iterator>
@@ -6,6 +5,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "core/allocator.h"
 namespace infini
 {
     Allocator::Allocator(Runtime runtime) : runtime(runtime)

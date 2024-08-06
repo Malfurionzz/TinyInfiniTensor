@@ -1,5 +1,8 @@
 #include "core/graph.h"
+#include "core/blob.h"
+#include "core/runtime.h"
 #include <algorithm>
+#include <cstddef>
 #include <memory>
 #include <numeric>
 #include <queue>
@@ -148,8 +151,12 @@ namespace infini
     {
         // topological sorting first
         IT_ASSERT(topo_sort() == true);
-        // allocator.ptr = reinterpret_cast<void*>(new char[peak]);
-        
+        for (auto ts: tensors) {
+            size_t offset = allocator.alloc(ts->getBytes());
+            auto blob =make_ref<BlobObj>(runtime,
+                    reinterpret_cast<void*>(reinterpret_cast<char*>(allocator.getPtr()) + offset));
+            ts->setDataBlob(blob);
+        }
         // =================================== 作业 ===================================
         // TODO：利用 allocator 给计算图分配内存
         // HINT: 获取分配好的内存指针后，可以调用 tensor 的 setDataBlob 函数给 tensor 绑定内存
