@@ -1,5 +1,6 @@
 #include "core/graph.h"
 #include <algorithm>
+#include <memory>
 #include <numeric>
 #include <queue>
 
@@ -147,7 +148,8 @@ namespace infini
     {
         // topological sorting first
         IT_ASSERT(topo_sort() == true);
-
+        // allocator.ptr = reinterpret_cast<void*>(new char[peak]);
+        
         // =================================== 作业 ===================================
         // TODO：利用 allocator 给计算图分配内存
         // HINT: 获取分配好的内存指针后，可以调用 tensor 的 setDataBlob 函数给 tensor 绑定内存

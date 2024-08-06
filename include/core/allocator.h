@@ -1,6 +1,7 @@
 #pragma once
 #include "core/runtime.h"
 #include "core/tensor.h"
+#include <climits>
 #ifdef BUILD_TEST
 #include "gtest/gtest.h"
 #endif
@@ -22,7 +23,9 @@ namespace infini {
 
     // pointer to the memory actually allocated
     void *ptr;
+    std::map<size_t, size_t> freeBlockMap;
 
+    static constexpr size_t BLOCK_SZIE = INT_MAX;
     // =================================== 作业 ===================================
     // TODO：可能需要设计一个数据结构来存储free block，以便于管理和合并
     // HINT: 可以使用一个 map 来存储 free block，key 为 block 的起始/结尾地址，value 为 block 的大小

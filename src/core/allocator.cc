@@ -1,4 +1,9 @@
 #include "core/allocator.h"
+#include <cstdio>
+#include <cstdlib>
+#include <iterator>
+#include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 namespace infini
@@ -13,6 +18,9 @@ namespace infini
         // the longest data type currently supported by the DataType field of
         // the tensor
         alignment = sizeof(uint64_t);
+
+        freeBlockMap.insert({0,BLOCK_SZIE});
+
     }
 
     Allocator::~Allocator()
@@ -28,7 +36,20 @@ namespace infini
         IT_ASSERT(this->ptr == nullptr);
         // pad the size to the multiple of alignment
         size = this->getAlignedSize(size);
-
+        for(auto it = freeBlockMap.begin(); it != freeBlockMap.end(); ++it){
+            if( it->second >= size){
+                auto addr = it->first;
+                used += size;
+                peak = std::max(peak,used);
+                auto offset = it->first + size;
+                auto freeSize = it->second - size;
+                freeBlockMap.erase(it);
+                freeBlockMap.insert({offset,freeSize});
+                // std::printf("Allocte %ld bytes at %ld\n", size,addr);
+                return addr;
+                }
+                throw std::runtime_error("No enough space in the block!");
+            }
         // =================================== 作业 ===================================
         // TODO: 设计一个算法来分配内存，返回起始地址偏移量
         // =================================== 作业 ===================================
@@ -40,7 +61,16 @@ namespace infini
     {
         IT_ASSERT(this->ptr == nullptr);
         size = getAlignedSize(size);
-
+        used -= size;
+        auto it_m = freeBlockMap.insert({addr,size});
+        auto it = it_m.first;
+        auto it_n = std::next(it);
+        if(it_n != freeBlockMap.end() && addr+size >= it_n->first){
+            auto newSize = std::max(size,it_n->first + it_n->second - it->first);
+            freeBlockMap.erase(it_n);
+            it->second = newSize;
+        }
+        // std::printf("Free %ld bytes at %ld\n", size, addr);
         // =================================== 作业 ===================================
         // TODO: 设计一个算法来回收内存
         // =================================== 作业 ===================================
