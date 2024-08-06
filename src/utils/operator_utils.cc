@@ -1,5 +1,6 @@
 #include "utils/operator_utils.h"
 #include "core/runtime.h"
+#include "core/tensor.h"
 
 namespace infini {
 
@@ -9,8 +10,17 @@ Shape infer_broadcast(const Shape &A, const Shape &B) {
     // TODO：对 A 和 B 进行双向广播，返回广播后的形状。
     // REF: https://github.com/onnx/onnx/blob/main/docs/Broadcasting.md
     // =================================== 作业 ===================================
-    
-    return {};
+    size_t diffDim = A.size()< B.size()? B.size()- A.size() : A.size() -B.size();
+    Shape toBroadCast = A.size()< B.size()? A : B;
+    const auto &leftOne = A.size()< B.size()? B : A;
+    Shape output;
+    if(diffDim != 0)
+        toBroadCast.insert(toBroadCast.begin(),diffDim, 1);
+
+    for(size_t i = 0 ; i < leftOne.size() ; ++i){
+        output.push_back(std::max(toBroadCast[i],leftOne[i]));
+    }
+    return output;
 }
 
 int get_real_axis(const int &axis, const int &rank) {

@@ -6,6 +6,7 @@
 #include <memory>
 #include <numeric>
 #include <queue>
+#include <vector>
 
 namespace infini
 {
@@ -151,11 +152,16 @@ namespace infini
     {
         // topological sorting first
         IT_ASSERT(topo_sort() == true);
-        for (auto ts: tensors) {
+        std::vector<size_t> offsets;
+        for (const auto &ts: tensors) {
             size_t offset = allocator.alloc(ts->getBytes());
-            auto blob =make_ref<BlobObj>(runtime,
-                    reinterpret_cast<void*>(reinterpret_cast<char*>(allocator.getPtr()) + offset));
-            ts->setDataBlob(blob);
+            offsets.emplace_back(offset);
+        }
+        
+        for (size_t i = 0; i< tensors.size();++i) {
+            auto blob = make_ref<BlobObj>(runtime,
+                    reinterpret_cast<void*>((size_t)allocator.getPtr() + offsets[i]));
+            tensors[i]->setDataBlob(blob);
         }
         // =================================== 作业 ===================================
         // TODO：利用 allocator 给计算图分配内存

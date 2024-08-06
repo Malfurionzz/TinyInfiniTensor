@@ -1,4 +1,5 @@
 #include "operators/unary.h"
+#include "core/data_type.h"
 
 namespace infini
 {
@@ -39,7 +40,18 @@ namespace infini
         // TODO：返回经过 clip 操作后的 shape
         // REF: https://onnx.ai/onnx/operators/onnx__Clip.html#clip-13
         // =================================== 作业 ===================================
-        return std::nullopt;
+        vector<Shape> outputs;
+        for(size_t tid = 0; tid < inputs.size(); ++tid){
+            const auto& A = inputs[tid];
+            int rank = A->getRank();
+            const auto &input_dim = A->getDims();
+            auto output_dim = Shape(rank);
+            for(int i = 0; i < rank; ++i){
+                output_dim[i] = input_dim[i]; 
+            }
+            outputs.emplace_back(std::move(output_dim));
+        }
+        return outputs;
     }
 
     std::string ClipObj::toString() const
@@ -66,7 +78,11 @@ namespace infini
         // REF_FILE: src/core/operator.cc
         // REF: https://onnx.ai/onnx/operators/onnx__Cast.html#cast-21
         // =================================== 作业 ===================================
-        return {};
+        vector<DataType> outputs;
+        for(auto ts: inputs){
+            outputs.push_back(getOutputDataType());
+        }
+        return outputs;
     }
 
     optional<vector<Shape>> CastObj::inferShape(const TensorVec &inputs)
@@ -75,7 +91,18 @@ namespace infini
         // TODO：返回经过 cast 操作后的 shape
         // REF: https://onnx.ai/onnx/operators/onnx__Cast.html#cast-21
         // =================================== 作业 ===================================
-        return std::nullopt;
+        vector<Shape> outputs;
+        for(size_t tid = 0; tid < inputs.size(); ++tid){
+            const auto& A = inputs[tid];
+            int rank = A->getRank();
+            const auto &input_dim = A->getDims();
+            auto output_dim = Shape(rank);
+            for(int i = 0; i < rank; ++i){
+                output_dim[i] = input_dim[i]; 
+            }
+            outputs.emplace_back(std::move(output_dim));
+        }
+        return outputs;
     }
 
     std::string CastObj::toString() const
