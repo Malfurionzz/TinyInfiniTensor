@@ -8,7 +8,7 @@ CMAKE_OPT += -DBUILD_TEST=$(TEST)
 
 build:
 	mkdir -p build/$(TYPE)
-	cd build/$(TYPE) && cmake $(CMAKE_OPT) ../.. && make -j8
+	cd build/$(TYPE) && cmake $(CMAKE_OPT) ../.. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 && make -j64
 
 clean:
 	rm -rf build
